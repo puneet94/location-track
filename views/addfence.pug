@@ -1,0 +1,152 @@
+doctype html
+html(lang='en')
+	head
+		meta(charset='utf-8')
+		title MiiTrace
+		meta(name='viewport', content='width=device-width, initial-scale=1.0')
+		meta(name='description', content='')
+		meta(name='author', content='')
+		// Le styles
+		script(type='text/javascript', src='assets/js/jquery.min.js')
+		// <link rel="stylesheet" href="assets/css/style.css">
+		link(rel='stylesheet', href='assets/css/loader-style.css')
+		link(rel='stylesheet', href='assets/css/bootstrap.css')
+		link(rel='stylesheet', href='assets/css/signin.css')
+		// HTML5 shim, for IE6-8 support of HTML5 elements
+		//if lt IE 9
+			script(src='http://html5shim.googlecode.com/svn/trunk/html5.js')
+		// Fav and touch icons
+		link(rel='shortcut icon', href='assets/ico/minus.png')
+	style.
+		body{
+				background: url(icon/bg_blurr.png) no-repeat center center fixed; 
+				background-size:cover;
+				background-color:rgba(255,255,255,0.5);
+				
+
+
+		}
+		.account-box{
+		border:1px solid gray;
+		}
+	body
+		// Preloader
+		#preloader
+			#status  
+		.container
+			#login-wrapper
+				.row
+					.col-md-8(style="position:relative;")
+						#logo-login
+							h1
+								| ADD FENCE
+				.row
+					.col-md-8(style="position:relative")
+						.account-box
+							#map(style="position:relative;height:400px;width:100%;")
+							script.
+								// This example requires the Drawing library. Include the libraries=drawing
+								// parameter when you first load the API. For example:
+								// <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=drawing">
+								function getMap(){
+									return new google.maps.Map(document.getElementById('map'), {
+										center: {lat: -34.397, lng: 150.644},
+										zoom: 8
+									});
+								}
+								function initMap() {
+							
+									var map = getMap();
+									var drawingManager = new google.maps.drawing.DrawingManager({
+										drawingMode: google.maps.drawing.OverlayType.MARKER,
+										drawingControl: true,
+										drawingControlOptions: {
+											position: google.maps.ControlPosition.TOP_CENTER,
+											drawingModes: [ 'polygon']
+										},
+										markerOptions: {icon: 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png'},
+										circleOptions: {
+											fillColor: '#ffff00',
+											fillOpacity: 1,
+											strokeWeight: 5,
+											clickable: false,
+											editable: true,
+											zIndex: 1
+										}
+									});
+									drawingManager.setMap(map);
+									$('#fenceClear').on('click',clearFence(drawingManager));
+									
+									var fenceObject = {};
+									$('#fenceSubmit').on('click',submitFence(drawingManager,fenceObject));
+									getPolygon(drawingManager,fenceObject);
+
+								}
+								function clearFence(drawingManager){
+									return function(){
+										drawingManager.setMap(getMap());
+									}
+								}
+								function submitAjax(fenceObject){
+									$.post( "/addfence", fenceObject,function( data ) {
+										console.log(data);
+										alert("Geofence successfully created");
+									});
+								}
+								function submitFence(drawingManager,fenceObject){
+									
+									return function(){
+										fenceObject.fenceName = $('.fenceNameInput').val();
+										if(fenceObject.fenceArray && fenceObject.fenceName){
+											
+											submitAjax(fenceObject);
+											drawingManager.setMap(getMap());
+
+										}else{
+											alert("please create a fence");
+											
+										}
+										
+									}
+								}
+								function getPolygon(drawingManager,fenceObject){
+									google.maps.event.addListener(drawingManager, 'overlaycomplete', function(polygon) {
+										var polygonArray = [];
+										$.each(polygon.overlay.latLngs.b[0].b, function(key, latlng){
+											var lat = latlng.lat();
+											var lon = latlng.lng();
+											polygonArray.push( [lat,lon]);
+										});
+										fenceObject.fenceArray  = polygonArray;
+									
+									});
+								}
+							script(src='https://maps.googleapis.com/maps/api/js?key=AIzaSyDhTRYIz4znpMwkFxBwkNbMV-Otp5_vvsI&libraries=drawing&callback=initMap', async='', defer='')
+	
+					.col-md-4
+						.form-group
+							label
+								| Fence name
+							input(type="text" class="form-control fenceNameInput")
+						button( class="btn btn-default" id="fenceClear")
+							| Clear
+		
+						button( class="btn btn-success" id="fenceSubmit")
+							| Submit
+		
+		
+		
+		
+
+
+
+		// END OF PAPER WRAP
+		// MAIN EFFECT
+		script(type='text/javascript', src='assets/js/preloader.js')
+		script(type='text/javascript', src='assets/js/bootstrap.js')
+		script(type='text/javascript', src='assets/js/app.js')
+		script(type='text/javascript', src='assets/js/load.js')
+		script(type='text/javascript', src='assets/js/main.js')
+		
+
+
