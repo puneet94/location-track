@@ -9,6 +9,7 @@ module.exports = function(app){
 		}
 		else
 		{
+			
 			console.log('inside else');
 			var device_history_model = require('../models/device_history_model.js');
 			if(request.query.date == undefined)

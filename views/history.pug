@@ -307,7 +307,7 @@ html(lang='en')
                   span.pull-left
                     i.maki-aboveground-rail.gauge-position
                   #getting-started-custom2
-                    span(style="font-size: 60px;margin-right: 10px;position: relative;top: 0px;") 00 Km
+                    span(class="deviceDistanceCovered" style="font-size: 60px;margin-right: 10px;position: relative;top: 0px;") 00 Km
                 .progress-tinny
                   .bar(style='width: 25%')
                 
@@ -317,7 +317,7 @@ html(lang='en')
                   h3
                     span
                       i.entypo-flash
-                      |   Calories Burned
+                      |   Fuel Burned
                   .titleClose
                     a.gone(href='#orderClose')
                       span.entypo-cancel
@@ -808,7 +808,7 @@ html(lang='en')
     //-           br
     //-           i 30KM/h avarage Result
     // END OF RIGHT SLIDER CONTENT
-    script(type='text/javascript', src='http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.js')
+    script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.js')
     script(src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js")
     script(type='text/javascript', src='https://cdn.jsdelivr.net/momentjs/latest/moment.min.js')
     script(type='text/javascript', src='https://cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js')
@@ -895,6 +895,22 @@ html(lang='en')
       }, 3500);
 
     script(type='text/javascript').
+      function getDistance(points){
+        var lat1 =  points[0].lat;
+        var lon1 =  points[0].lng;
+        var lat2 =  points[1].lat;
+        var lon2 =  points[1].lng;
+        var radlat1 = Math.PI * lat1/180;
+      	var radlat2 = Math.PI * lat2/180;
+      	var theta = lon1-lon2;
+      	var radtheta = Math.PI * theta/180
+      	var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+      	dist = Math.acos(dist);
+      	dist = dist * 180/Math.PI;
+      	dist = dist * 60 * 1.1515;
+      	return dist * 1.609344;
+  
+      }
       $('input[name="date"]').daterangepicker({"opens": "left"});
       $('.daterangepicker .ranges').remove();
       var data=!{JSON.stringify(data)} ;
@@ -904,6 +920,7 @@ html(lang='en')
       //- //- data = !{JSON.stringify(data)};
       //- //- data=JSON.parse(data[0]);
       //- //- console.log(data);
+      
       var map;
       var mark;
       var pmark;
@@ -967,12 +984,24 @@ html(lang='en')
       //-   },1000);
 
         function myMap1(){
+        
           map  = new google.maps.Map(document.getElementById('googleMap'), {center:{lat:Number(data[0].latitude) , lng:Number(data[0].longitude)},zoom:5});
           mark = new google.maps.Marker({position:{lat:Number(data[data.length-1].latitude), lng:Number(data[data.length-1].longitude)}, map:map});
-          //- lineCoords.push(new google.maps.LatLng(res.data.latitude, res.data.longitude));
+            //- lineCoords.push(new google.maps.LatLng(res.data.latitude, res.data.longitude));
           for(i=0;i<data.length;i++){
-            lineCoords.push(new google.maps.LatLng(Number(data[i].latitude), Number(data[i].longitude)));
+            //lineCoords.push(new google.maps.LatLng(Number(data[i].latitude), Number(data[i].longitude)));
+            lineCoords.push({lat: Number(data[i].latitude), lng: Number(data[i].longitude)});
           }
+          var distanceCovered = 0;
+          if(lineCoords.length>0){
+            for(var j=0;j<lineCoords.length-1;j++){
+              distanceCovered = distanceCovered+getDistance([lineCoords[j],lineCoords[j+1]]);
+            }
+            
+  
+          }
+          $('.deviceDistanceCovered').text(distanceCovered+"KMS");
+          
                   var lineCoordinatesPath = new google.maps.Polyline({
                   path: lineCoords,
                   geodesic: true,
