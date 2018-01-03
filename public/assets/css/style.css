@@ -33,19 +33,26 @@ body {
 }
 #preloader {
     background: transparent;
-    \9;
     /* IE 8 and below */
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(37, 45, 59, 0.8);
+    background-color: rgba(37, 45, 59, 1);
     /* change if the mask should have another color then white */
     z-index: 2000;
     /* makes sure it stays on top */
     /*   background-image: url("../img/overlays/06.png");
   background-repeat: repeat; */
+}
+#preloader:after {
+  content: "Loading...";
+  position: absolute;
+  left: 45%;
+  color: white;
+  top: 50%;
+  font-family: monospace;
 }
 #mapContainer {
     font-family: sans-serif;
