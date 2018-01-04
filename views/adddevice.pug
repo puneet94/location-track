@@ -54,13 +54,14 @@ html(lang='en')
 											option(value=g.group_name) #{g.group_name} 
 									label(for="deviceid") IMEI : 
 									input.form-control(type="text", name="imei", required)
-									
 									label(for="driver_name") User Name : 
 									input.form-control(type="text", name="user_name", required)
 									label(for="driver_age") DOB : 
 									input.form-control(type="date", name="DOB", required)
-									label(for="driver_age") Age : 
-									input.form-control(type="number", name="age", required)
+									label(for="driver_weight") Weight in Kgs: 
+									input.form-control(type="number", name="weight", required)
+									label(for="driver_height") Height in cms: 
+									input.form-control(type="number", name="height", required)
 									label(for="contact_number") Contact Number : 
 									input.form-control(type="text", name="contact_number", required)
 									label(for="emergency_contact") Emergency Contact Number : 
@@ -71,10 +72,14 @@ html(lang='en')
 								
 								button.btn.btn.btn-primary.pull-right(type='submit')
 									| Add Device
+								button.btn.btn.btn-danger.pull-right#cancelBack(style="margin-right:3px;")
+									| Cancel
 							br
 							br
 							
 		
+		
+			
 		// END OF PAPER WRAP
 		// MAIN EFFECT
 		script(type='text/javascript', src='assets/js/preloader.js')
@@ -82,4 +87,8 @@ html(lang='en')
 		script(type='text/javascript', src='assets/js/app.js')
 		script(type='text/javascript', src='assets/js/load.js')
 		script(type='text/javascript', src='assets/js/main.js')
+		script(type="text/javascript").
+			$('#cancelBack').on('click',function(){
+				window.history.back();
+			});
 		

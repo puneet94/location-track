@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-var con = mongoose.createConnection('mongodb://miitrace:miitrace@ds129966.mlab.com:29966/miitrace');
-//var con = mongoose.createConnection('mongodb://localhost:27017/new_miitrace_db');
+//var con = mongoose.createConnection('mongodb://miitrace:miitrace@ds129966.mlab.com:29966/miitrace');
+var con = mongoose.createConnection('mongodb://localhost:27017/new_miitrace_db');
 var devices_schema = new Schema({
 	_id :{
 		type : Number,
@@ -38,9 +38,18 @@ var devices_schema = new Schema({
 		required : true,
 		trim : true
 	},
+	weight: {
+		type : Number,
+		trim : true,
+		default: 60
+	},
+	height: {
+		type : Number,
+		trim : true,
+		default: 150
+	},
 	age :{
 		type : Number,
-		required : true,
 		trim : true
 	},
 	contact_number :{
@@ -68,7 +77,7 @@ var devices_schema = new Schema({
 		default: 0
 
 	}
-});
+},{timestamps: true});
 
 con.on('error',function(error){
 	console.log("error occurred while connecting to the database "+error);

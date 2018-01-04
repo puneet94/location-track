@@ -317,7 +317,7 @@ html(lang='en')
                   h3
                     span
                       i.entypo-flash
-                      |   Fuel Burned
+                      |   Calories Burned
                   .titleClose
                     a.gone(href='#orderClose')
                       span.entypo-cancel
@@ -325,7 +325,8 @@ html(lang='en')
                   span.pull-left
                     i.entypo-flash.gauge-position
                   #getting-started-custom2
-                    span(style="font-size: 60px;margin-right: 10px;position: relative;top: 0px;") 00
+                    span(style="font-size: 60px;margin-right: 10px;position: relative;top: 0px;").
+                      #{caloriesBurned}
                 .progress-tinny
                   .bar(style='width: 10%')
                 
@@ -357,13 +358,18 @@ html(lang='en')
                 .title-alt
                   h6
                     span.fontawesome-bell
-                    |  Log Data
+                      |  Log Data
+                      
+                  
                   .titleClose
                     a.gone(href='#siteClose')
                       span.entypo-cancel
                   .titleToggle
                     a.nav-toggle-alt(href='#site')
                       span.entypo-up-open
+                  .titleClose(style="margin-top:20px;")
+                    a(href="./uploads/"+filename_id+".xlsx",download=true)
+                          | Download Excel
                 #site.body-nest(style='max-height:250px;overflow-y:auto;')
                   //- .table-responsive
                   //-   table.table
@@ -857,7 +863,7 @@ html(lang='en')
         dbtn.style.display="block";
         dsel = document.getElementById("deviceselect");
         gval = document.getElementById("groupselect").value;
-        console.log(gval);
+        
         $.ajax({
         type:"GET",
         url:"/get_imei",
@@ -869,10 +875,9 @@ html(lang='en')
         success:function(result)
         {
           console.clear();
-          console.log("the dropdown result");
-          console.log(result);
+          
           $.each(result, function(index, value){
-                  console.log("found d");
+                  
               option= document.createElement("option");
                option.value=value.imei; 
               option.text=value.imei;
@@ -914,7 +919,7 @@ html(lang='en')
       $('input[name="date"]').daterangepicker({"opens": "left"});
       $('.daterangepicker .ranges').remove();
       var data=!{JSON.stringify(data)} ;
-     console.log(data);
+     
       //- data=[];
 
       //- //- data = !{JSON.stringify(data)};
@@ -984,7 +989,7 @@ html(lang='en')
       //-   },1000);
 
         function myMap1(){
-        
+          console.clear();
           map  = new google.maps.Map(document.getElementById('googleMap'), {center:{lat:Number(data[0].latitude) , lng:Number(data[0].longitude)},zoom:5});
           mark = new google.maps.Marker({position:{lat:Number(data[data.length-1].latitude), lng:Number(data[data.length-1].longitude)}, map:map});
             //- lineCoords.push(new google.maps.LatLng(res.data.latitude, res.data.longitude));
@@ -995,12 +1000,20 @@ html(lang='en')
           var distanceCovered = 0;
           if(lineCoords.length>0){
             for(var j=0;j<lineCoords.length-1;j++){
-              distanceCovered = distanceCovered+getDistance([lineCoords[j],lineCoords[j+1]]);
+              var distanceTravelled = getDistance([lineCoords[j],lineCoords[j+1]]);
+              if(!isNaN(distanceTravelled)){
+                distanceCovered = distanceCovered+distanceTravelled;
+              }else{
+                distanceCovered = distanceCovered+0;
+              }
+              
+             
+              
             }
             
   
           }
-          $('.deviceDistanceCovered').text(distanceCovered+"KMS");
+          $('.deviceDistanceCovered').text(Math.round(distanceCovered,2)+"KMS");
           
                   var lineCoordinatesPath = new google.maps.Polyline({
                   path: lineCoords,
@@ -1015,7 +1028,7 @@ html(lang='en')
         function execute(){
              timer = setTimeout(function () {
                        //- alert(array[i]);
-                    console.log(data[j]);
+                    
 
                 mark.setPosition({lat:Number(data[j].latitude), lng:Number(data[j].longitude)});
                        j++;

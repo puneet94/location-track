@@ -47,6 +47,10 @@ html(lang='en')
 										input.form-control(type="file", value=data.profile_pic_url name="profile_pic")
 									button.btn.btn.btn-primary.pull-right(type='submit')
 										| Update
+									button.btn.btn.btn-danger.pull-right#cancelBack(style="margin-right:3px;")
+										| Back
+
+		
 									br
 									br
 
@@ -58,4 +62,7 @@ html(lang='en')
 		script(type='text/javascript', src='assets/js/app.js')
 		script(type='text/javascript', src='assets/js/load.js')
 		script(type='text/javascript', src='assets/js/main.js')
-		script(type='text/javascript').
+		script(type="text/javascript").
+			$('#cancelBack').on('click',function(){
+				window.history.back();
+			});

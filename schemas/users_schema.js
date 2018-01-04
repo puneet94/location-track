@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-var con = mongoose.createConnection('mongodb://miitrace:miitrace@ds129966.mlab.com:29966/miitrace');
-//var con = mongoose.createConnection('mongodb://localhost:27017/new_miitrace_db');
+//var con = mongoose.createConnection('mongodb://miitrace:miitrace@ds129966.mlab.com:29966/miitrace');
+var con = mongoose.createConnection('mongodb://localhost:27017/new_miitrace_db');
 var users_schema = new Schema({
 	_id :{
 		type : Number,
@@ -62,7 +62,7 @@ var users_schema = new Schema({
 		required : true,
 		trime : true
 	}
-});
+},{timestamps: true});
 
 con.on('error',function(error){
 	console.log("error occurred while connecting to the database "+error);

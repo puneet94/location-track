@@ -1,15 +1,34 @@
+var json2xls = require('json2xls');
+var moment = require('moment');
+var fs = require('fs');
+function calculateDays(startDate,endDate)
+{
+	console.log(startDate);
+	console.log(endDate);
+   var start_date = moment(startDate,'DD/MM/YYYY');
+   var end_date = moment(endDate,'DD/MM/YYYY');
+   var duration = moment.duration(end_date.diff(start_date));
+   var hours = duration.asHours();       
+   return hours*60;
+}
 module.exports = function(request, response, deviceid,start_date, end_date, group_name)
 {
 	console.log('start_date is ', start_date);
 	console.log('end_date is ', end_date);
 	console.log('group_name is ', group_name);
+	console.log("device_id",deviceid);
 	var devices_model = require('../schemas/devices_schema.js');
-	var moment = require('moment');
+	
+	var fileURL = "./public/uploads/"+request.cookies._id+".xlsx";
+	if(fs.existsSync(fileURL)){
+		fs.unlinkSync(fileURL);
+	}
+	
 	moment().format();
 	if(start_date == undefined && end_date == undefined && group_name == undefined)
 	{
 		console.log('first');
-		return devices_model.find({owner_id : request.cookies._id}, {imei : 1, _id : 0},  function(error, result)
+		return devices_model.find({owner_id : request.cookies._id}, {imei : 1, _id : 0,weight:1},  function(error, result)
 		{
 			if(error)
 			{
@@ -154,7 +173,7 @@ module.exports = function(request, response, deviceid,start_date, end_date, grou
 	if(start_date != "" && end_date != "" && group_name != "")
 	{
 		console.log('fourth');
-		return devices_model.find({owner_id : request.cookies._id, group_name : group_name}, {imei : 1, _id : 0},  function(error, result)
+		return devices_model.find({owner_id : request.cookies._id, group_name : group_name}, {imei : 1, _id : 0,weight:1},  function(error, result)
 		{
 			if(error)
 			{
@@ -166,12 +185,22 @@ module.exports = function(request, response, deviceid,start_date, end_date, grou
 			{
 				if(deviceid!="")
 				{
-					console.log('fifth');
+					
+					var weight_person = 60;
+					for(var k=0;k<result.length;k++){
+						if(result[k]['imei']==deviceid){
+							weight_person = result[k]['weight'];
+							
+						}
+					}
+					
+
 					var devices_data_model=require('../schemas/device_data_schema.js');
+					
 					start_date=moment(start_date).format('DD/MM/YYYY');
           		  	end_date=moment(end_date).format('DD/MM/YYYY');
 					console.log(start_date, end_date);
-					devices_data_model.find({imei : deviceid, date : {$gte : start_date, $lte : end_date}}, function(error, result)
+					devices_data_model.find({imei : deviceid, date : {$gte : start_date, $lte : end_date}},null,{sort:"createdAt"}, function(error, result)
 					{
 						if(error)
 						{
@@ -181,14 +210,19 @@ module.exports = function(request, response, deviceid,start_date, end_date, grou
 						}
 						else
 						{
-							// console.log('successfully fetched the logs ', result);
+							 console.log('successfully fetched the logs ', result);
 							response.status(200);
 							// response.send('success');
-							console.log(JSON.parse(request.cookies.my_groups));
-							console.log('length is ', result.length);
+							var xls = json2xls(JSON.parse(JSON.stringify(result)),{
+								fields: ['imei','date','latitude','longitude','time']
+							});
+
+							fs.writeFileSync(fileURL, xls, 'binary');
 							if(result.length !=0)
 							{
-								return response.render('history.pug', { groups : JSON.parse(request.cookies.my_groups).groups, username : request.cookies.user_name, pic : request.cookies.profile_pic_url, data : result });
+								var totalMinutes = Math.abs(calculateDays(result[0].date,result[result.length-1].date));
+								var caloriesBurned = 0.06125 * weight_person * totalMinutes;
+								return response.render('history.pug', { groups : JSON.parse(request.cookies.my_groups).groups, username : request.cookies.user_name, pic : request.cookies.profile_pic_url, data : result,caloriesBurned:caloriesBurned });
 							}
 							else
 							{
@@ -205,13 +239,12 @@ module.exports = function(request, response, deviceid,start_date, end_date, grou
 					{
 						imeis.push(result[i].imei);
 					}
-					console.log('result is ', result);
-					console.log('imeis array is ', imeis);
+					
 					var devices_data_model = require('../schemas/device_data_schema.js');
 					start_date=moment(start_date).format('DD/MM/YYYY');
             		end_date=moment(end_date).format('DD/MM/YYYY');
 					console.log(start_date, end_date);
-					devices_data_model.find({imei : {$in : imeis}, date : {$gte : start_date, $lte : end_date}}, function(error, result)
+					devices_data_model.find({imei : {$in : imeis}, date : {$gte : start_date, $lte : end_date}},null,{sort:"createdAt"}, function(error, result)
 					{
 						if(error)
 						{
@@ -224,11 +257,16 @@ module.exports = function(request, response, deviceid,start_date, end_date, grou
 							// console.log('successfully fetched the logs ', result);
 							response.status(200);
 							// response.send('success');
-							console.log(JSON.parse(request.cookies.my_groups));
-							console.log('length is ', result.length);
+							
+							
+							var xls = json2xls(JSON.parse(JSON.stringify(result)),{
+								fields: ['imei','date','latitude','longitude','time']
+							});
+
+							fs.writeFileSync(fileURL, xls, 'binary');
 							if(result.length !=0)
 							{
-								return response.render('history.pug', { groups : JSON.parse(request.cookies.my_groups).groups, username : request.cookies.user_name, pic : request.cookies.profile_pic_url, data : result });
+								return response.render('history.pug', { filename_id:request.cookies._id,groups : JSON.parse(request.cookies.my_groups).groups, username : request.cookies.user_name, pic : request.cookies.profile_pic_url, data : result });
 							}
 							else
 							{

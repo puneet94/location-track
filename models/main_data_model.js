@@ -27,6 +27,8 @@ module.exports = function(data, request, response){
 
 		}
 		if(device){
+			device['device_status'] = 1;
+			device.save();
 			fence_model.findById(device.fence,function(err,fence){
 				if(err){
 

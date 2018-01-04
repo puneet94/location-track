@@ -1,5 +1,6 @@
 module.exports = function(app){
 	app.post('/devicedata', function(request, response){
+		console.log(request.body);
 		console.log('data received from tcpserver is ', request.body.msg);
 		var main_data_model = require('../models/main_data_model.js');
 		var temp = {
