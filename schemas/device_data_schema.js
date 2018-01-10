@@ -1,8 +1,8 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-//var con = mongoose.createConnection('mongodb://miitrace:miitrace@ds129966.mlab.com:29966/miitrace');
-var con = mongoose.createConnection('mongodb://localhost:27017/new_miitrace_db');
+var con = mongoose.createConnection('mongodb://miitrace:miitrace@ds129966.mlab.com:29966/miitrace');
+//var con = mongoose.createConnection('mongodb://localhost:27017/new_miitrace_db');
 var device_data_schema = new Schema({
 	imei :{
 	 	type : String,
